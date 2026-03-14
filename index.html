@@ -5,21 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Para Danielita🌻</title>
     <style>
-        body { margin: 0; overflow: hidden; background: radial-gradient(circle, #e6f7ff, #fff); display: flex; justify-content: center; align-items: center; height: 100vh; font-family: 'Arial', sans-serif; }
+        body { margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: 'Arial', sans-serif; }
         canvas { display: block; filter: drop-shadow(0 0 10px rgba(0,0,0,0.1)); }
         #mensaje { position: absolute; top: 15%; color: #333; text-align: center; opacity: 0; transition: opacity 3s; width: 100%; text-shadow: 1px 1px 3px rgba(0,0,0,0.1); }
         h1 { font-size: 2.5rem; margin: 0; color: #ffeb3b; -webkit-text-stroke: 1px #d32f2f; }
     </style>
 </head>
 <body>
-    <canvas id="memeCanvas"></canvas>
+    <canvas id="canvasFinal"></canvas>
     <div id="mensaje">
-        <h1>para ti mibida 🫶🏻</h1>
-        <p> ATTE: Julian ;) </p>
+        <h1>para ti mibida 🫶🏻 </h1>
+        <p> De Juliancito ;)</p>
     </div>
 
     <script>
-        const canvas = document.getElementById('memeCanvas');
+        const canvas = document.getElementById('canvasFinal');
         const ctx = canvas.getContext('2d');
         const mensaje = document.getElementById('mensaje');
 
@@ -32,70 +32,91 @@
 
         let tiempo = 0;
 
-        // --- FUNCIÓN DE DIBUJO DEL GATITO ATIGRADO ---
+        // --- FUNCIONES DE DIBUJO DEL PAISAJE (RECUPERADO) ---
 
-        function dibujarGatitoEstiloMeme(x, y) {
+        function dibujarCieloYPrado() {
+            // Cielo con gradiente
+            const gradCielo = ctx.createLinearGradient(0, 0, 0, canvas.height * 0.65);
+            gradCielo.addColorStop(0, "#87CEEB"); // Azul cielo
+            gradCielo.addColorStop(1, "#E0F7FA"); // Azul muy claro
+            ctx.fillStyle = gradCielo;
+            ctx.fillRect(0, 0, canvas.width, canvas.height * 0.65);
+
+            // Prado con gradiente
+            const gradPrado = ctx.createLinearGradient(0, canvas.height * 0.65, 0, canvas.height);
+            gradPrado.addColorStop(0, "#32CD32"); // Verde lima
+            gradPrado.addColorStop(1, "#228B22"); // Verde bosque
+            ctx.fillStyle = gradPrado;
+            ctx.fillRect(0, canvas.height * 0.65, canvas.width, canvas.height * 0.35);
+        }
+
+        function dibujarNube(x, y, escala) {
             ctx.save();
-            ctx.translate(x, y + canvas.height * 0.1);
+            ctx.translate(x + Math.sin(tiempo * 0.2 + x) * 20, y); // Movimiento lento
+            ctx.scale(escala, escala);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+            ctx.beginPath();
+            ctx.arc(0, 0, 30, 0, Math.PI * 2);
+            ctx.arc(35, -10, 40, 0, Math.PI * 2);
+            ctx.arc(70, 0, 30, 0, Math.PI * 2);
+            ctx.arc(35, 15, 30, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
 
-            // 1. CABEZA (Chibi, Atigrada)
+        // --- FUNCIONES DE DIBUJO DEL GATITO Y RAMO (CORREGIDOS) ---
+
+        function dibujarGatito(x, y) {
+            ctx.save();
+            ctx.translate(x, y + 100); // Subir un poco la cabeza para que no tape el lazo
+
+            // CABEZA (Chibi, Atigrada)
             ctx.beginPath();
             ctx.ellipse(0, 0, 100, 90, 0, 0, Math.PI * 2);
-            // Color base crema/dorado
-            ctx.fillStyle = "#F3E5AB";
+            ctx.fillStyle = "#F3E5AB"; // Crema
             ctx.fill();
             ctx.strokeStyle = "#DDD"; ctx.stroke();
 
-            // Patrón Atigrado (Stripes) - Usando gradientes
+            // Patrón Atigrado (Stripes)
             ctx.fillStyle = "rgba(139, 69, 19, 0.4)"; // Marrón suave
-            for(let i=-2; i<=2; i++){
-                ctx.fillRect(i*25 - 5, -90, 10, 30); // Rayas en la frente
-            }
-            ctx.fillRect(-100, -20, 30, 10); ctx.fillRect(70, -20, 30, 10); // Lados
+            for(let i=-2; i<=2; i++){ ctx.fillRect(i*25 - 5, -90, 10, 30); } // Rayas frente
+            ctx.fillRect(-100, -20, 30, 10); ctx.fillRect(70, -20, 30, 10); // Rayas lados
 
-            // 2. OREJAS
+            // OREJAS
             ctx.fillStyle = "#F3E5AB";
-            ctx.beginPath();
-            ctx.moveTo(-70, -60); ctx.lineTo(-90, -110); ctx.lineTo(-40, -80); ctx.fill(); // Izq
-            ctx.moveTo(70, -60); ctx.lineTo(90, -110); ctx.lineTo(40, -80); ctx.fill(); // Der
+            ctx.beginPath(); ctx.moveTo(-70, -60); ctx.lineTo(-90, -110); ctx.lineTo(-40, -80); ctx.fill(); // Izq
+            ctx.beginPath(); ctx.moveTo(70, -60); ctx.lineTo(90, -110); ctx.lineTo(40, -80); ctx.fill(); // Der
             ctx.fillStyle = "#FFC0CB"; // Rosa interior
             ctx.beginPath(); ctx.moveTo(-70, -60); ctx.lineTo(-80, -90); ctx.lineTo(-50, -75); ctx.fill();
             ctx.beginPath(); ctx.moveTo(70, -60); ctx.lineTo(80, -90); ctx.lineTo(50, -75); ctx.fill();
 
-            // 3. OJOS GIGANTES (El secreto de la ternura de Image 0)
+            // OJOS GIGANTES (Del Meme)
             const dibujarOjo = (ox, oy) => {
-                ctx.save();
-                ctx.translate(ox, oy);
-                // Iris (muy grande y oscuro)
-                ctx.beginPath();
-                ctx.arc(0, 0, 25, 0, Math.PI * 2);
+                ctx.save(); ctx.translate(ox, oy);
+                ctx.beginPath(); ctx.arc(0, 0, 25, 0, Math.PI * 2);
                 const gradIris = ctx.createRadialGradient(0, 0, 5, 0, 0, 25);
-                gradIris.addColorStop(0, "#1a1a1a");
-                gradIris.addColorStop(1, "#000");
-                ctx.fillStyle = gradIris;
-                ctx.fill();
-                // Reflejos (Sparkles)
-                ctx.fillStyle = "white";
+                gradIris.addColorStop(0, "#1a1a1a"); gradIris.addColorStop(1, "#000");
+                ctx.fillStyle = gradIris; ctx.fill();
+                ctx.fillStyle = "white"; // Reflejos
                 ctx.beginPath(); ctx.arc(-10, -10, 8, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.arc(8, 10, 4, 0, Math.PI * 2); ctx.fill();
                 ctx.restore();
             };
-            dibujarOjo(-40, -10); // Izq
-            dibujarOjo(40, -10);  // Der
+            dibujarOjo(-40, -10); dibujarOjo(40, -10);
 
-            // 4. SONROJO (Pena/Vergüenza)
+            // SONROJO (Vergüenza)
             ctx.fillStyle = "rgba(255, 182, 193, 0.5)";
             ctx.beginPath(); ctx.arc(-60, 20, 15, 0, Math.PI * 2); ctx.fill();
             ctx.beginPath(); ctx.arc(60, 20, 15, 0, Math.PI * 2); ctx.fill();
 
-            // 5. NARIZ Y BOCA (Pequeña y linda)
+            // NARIZ Y BOCA (CORREGIDO: Ya no se confunde con el lazo)
             ctx.strokeStyle = "#333"; ctx.lineWidth = 2;
-            ctx.beginPath(); ctx.moveTo(-8, 15); ctx.lineTo(0, 22); ctx.lineTo(8, 15); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(-8, 15); ctx.lineTo(0, 22); ctx.lineTo(8, 15); ctx.stroke(); // Nariz
             // Boca tímida w
             ctx.beginPath(); ctx.arc(-4, 25, 4, 0, Math.PI); ctx.stroke();
             ctx.beginPath(); ctx.arc(4, 25, 4, 0, Math.PI); ctx.stroke();
 
-            // 6. PATITAS (Sosteniendo el ramo)
+            // PATITAS (Sosteniendo el ramo)
             ctx.fillStyle = "#F3E5AB"; ctx.strokeStyle="#AAA"; ctx.lineWidth=1;
             ctx.beginPath(); ctx.arc(-40, 60, 25, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
             ctx.beginPath(); ctx.arc(40, 60, 25, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
@@ -109,7 +130,7 @@
             ctx.save();
             ctx.translate(x, y);
             ctx.rotate(Math.sin(tiempo + x) * 0.05);
-            ctx.fillStyle = "#FFD700"; // Amarillo oro (Image 0)
+            ctx.fillStyle = "#FFD700"; // Amarillo oro
             ctx.strokeStyle = "#DAA520";
             for (let i = 0; i < petalos; i++) {
                 ctx.save();
@@ -123,22 +144,35 @@
         function dibujarRamo(x, y) {
             ctx.save();
             ctx.translate(x, y);
-            ctx.strokeStyle = "#228B22"; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(0, 100); ctx.lineTo(-70, -60); ctx.moveTo(0, 100); ctx.lineTo(70, -60); ctx.moveTo(0, 100); ctx.lineTo(0, -90); ctx.stroke();
-            ctx.fillStyle = "#FF69B4"; ctx.beginPath(); ctx.arc(0, 130, 15, 0, Math.PI * 2); ctx.ellipse(-20, 130, 20, 10, Math.PI/4, 0, Math.PI * 2); ctx.ellipse(20, 130, 20, 10, -Math.PI/4, 0, Math.PI * 2); ctx.fill();
-            
-            // Flores agrupadas (Intentando imitar la forma de Image 0)
+
+            // TALLOS
+            ctx.strokeStyle = "#228B22"; ctx.lineWidth = 6;
+            ctx.beginPath(); ctx.moveTo(0, 100); ctx.lineTo(-70, -60); ctx.moveTo(0, 100); ctx.lineTo(70, -60); ctx.moveTo(0, 100); ctx.lineTo(0, -90); ctx.stroke();
+
+            // LAZO ROSA (CORREGIDO: Mover más abajo para no tocar la nariz)
+            ctx.fillStyle = "#FF69B4";
+            const lazoY = 160; // Mover el lazo hacia abajo
+            ctx.beginPath(); ctx.arc(0, lazoY, 15, 0, Math.PI * 2); ctx.fill(); // Nudo
+            ctx.beginPath(); ctx.ellipse(-20, lazoY, 20, 10, Math.PI/4, 0, Math.PI * 2); ctx.fill(); // Lado izq
+            ctx.beginPath(); ctx.ellipse(20, lazoY, 20, 10, -Math.PI/4, 0, Math.PI * 2); ctx.fill(); // Lado der
+
+            // Flores agrupadas
             dibujarFlor(0, 0, 1.3); // Central
             dibujarFlor(-65, -45, 1.2); // Izq
             dibujarFlor(65, -45, 1.2);  // Der
             dibujarFlor(-35, -100, 1.1); // Arriba Izq
             dibujarFlor(35, -100, 1.1);  // Arriba Der
             dibujarFlor(0, -130, 1.0);   // Cima
+
             ctx.restore();
         }
 
         function animar() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             tiempo += 0.01;
+
+            dibujarCieloYPrado(); // Restaurar fondo
+            dibujarNube(100, 100, 0.8); dibujarNube(canvas.width - 200, 150, 1.2);
 
             const cx = canvas.width / 2;
             const cy = canvas.height * 0.55;
@@ -147,8 +181,11 @@
 
             ctx.save();
             ctx.translate(cx + tremorX, cy);
-            dibujarGatitoEstiloMeme(0, 50);
-            dibujarRamo(0, 0); // El ramo queda sobre las patas
+            
+            // --- ORDEN DE DIBUJO CORREGIDO ---
+            dibujarRamo(0, 0);    // Dibujar el ramo PRIMERO (atrás)
+            dibujarGatito(0, 50);  // Dibujar el gatito SEGUNDO (al frente)
+            
             ctx.restore();
 
             if (tiempo > 1.0) mensaje.style.opacity = 1;
