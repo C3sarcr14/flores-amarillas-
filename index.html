@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>21 de Marzo 🌻</title>
+    <style>
+        body { background-color: #050505; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; flex-direction: column; font-family: 'Courier New', Courier, monospace; }
+        canvas { filter: drop-shadow(0 0 20px rgba(255, 255, 0, 0.5)); }
+        #mensaje { color: #FFD700; margin-top: 20px; opacity: 0; transition: opacity 2s; text-align: center; padding: 0 20px; }
+    </style>
+</head>
+<body>
+    <canvas id="florCanvas"></canvas>
+    <div id="mensaje">
+        <h1>Unas flores amarillas que nunca se marchitan...</h1>
+        <p>Especialmente compiladas para una futura ingeniera<3.</p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('florCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 400;
+        canvas.height = 400;
+
+        function dibujarPetalo(x, y, radio, angulo) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angulo);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.bezierCurveTo(-radio/2, -radio/2, -radio/2, -radio*1.5, 0, -radio*1.5);
+            ctx.bezierCurveTo(radio/2, -radio*1.5, radio/2, -radio/2, 0, 0);
+            ctx.fillStyle = "#FFD700";
+            ctx.fill();
+            ctx.strokeStyle = "#DAA520";
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        let petaloActual = 0;
+        const totalPetalos = 12;
+
+        function animarFlor() {
+            if (petaloActual < totalPetalos) {
+                dibujarPetalo(200, 200, 80, (petaloActual * Math.PI * 2) / totalPetalos);
+                petaloActual++;
+                setTimeout(animarFlor, 250);
+            } else {
+                // Dibujar el centro de la flor
+                ctx.beginPath();
+                ctx.arc(200, 200, 25, 0, Math.PI * 2);
+                ctx.fillStyle = "#8B4513";
+                ctx.fill();
+                // Mostrar mensaje
+                document.getElementById('mensaje').style.opacity = '1';
+            }
+        }
+
+        // Tallo
+        ctx.strokeStyle = "green";
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(200, 200);
+        ctx.lineTo(200, 400);
+        ctx.stroke();
+
+        animarFlor();
+    </script>
+</body>
+</html>
