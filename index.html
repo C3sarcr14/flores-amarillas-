@@ -3,117 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramo Digital Animado 🌻</title>
+    <title>Un Ramo para Ti 🌻</title>
     <style>
-        body { background: radial-gradient(circle, #1a1a1a 0%, #000 100%); margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: 'Courier New', monospace; }
-        canvas { filter: drop-shadow(0 0 10px rgba(255, 255, 0, 0.2)); }
-        #mensaje { position: absolute; bottom: 50px; color: #FFD700; text-align: center; opacity: 0; transition: opacity 3s; text-shadow: 0 0 10px #FFD700; width: 100%; }
+        body { margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: 'Courier New', monospace; }
+        canvas { display: block; }
+        #mensaje { position: absolute; bottom: 30px; color: #fff; text-align: center; opacity: 0; transition: opacity 3s; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); width: 100%; }
     </style>
 </head>
 <body>
-    <canvas id="florCanvas"></canvas>
+    <canvas id="paisajeCanvas"></canvas>
     <div id="mensaje">
-        <h2>Flores amarillas infinitas para ti</h2>
-        <p>// 21 de Marzo // Ejecución completada con éxito</p>
+        <h2> Un ramo eterno. </h2>
+        <p> Para ti linda 🫶🏻 </p>
     </div>
 
     <script>
-        const canvas = document.getElementById('florCanvas');
+        const canvas = document.getElementById('paisajeCanvas');
         const ctx = canvas.getContext('2d');
         const mensaje = document.getElementById('mensaje');
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        // Configuración de pantalla completa
+        function ajustarLienzo() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        ajustarLienzo();
+        window.addEventListener('resize', ajustarLienzo);
 
         let tiempo = 0;
-        let floresDibujadas = 0;
-        const totalFlores = 7;
-        const particulas = [];
 
-        // Clase para los brillos (polen)
-        class Particula {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 1;
-                this.speedY = Math.random() * 0.5 + 0.2;
-                this.opacity = Math.random();
-            }
-            update() {
-                this.y -= this.speedY;
-                if (this.y < 0) this.y = canvas.height;
-            }
-            draw() {
-                ctx.fillStyle = `rgba(255, 215, 0, ${this.opacity})`;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
+        // --- FUNCIONES DE DIBUJO ---
+
+        function dibujarCieloYPrado() {
+            // Cielo con gradiente
+            const gradienteCielo = ctx.createLinearGradient(0, 0, 0, canvas.height * 0.7);
+            gradienteCielo.addColorStop(0, "#87CEEB"); // Azul cielo
+            gradienteCielo.addColorStop(1, "#E0F7FA"); // Azul muy claro
+            ctx.fillStyle = gradienteCielo;
+            ctx.fillRect(0, 0, canvas.width, canvas.height * 0.7);
+
+            // Prado con gradiente
+            const gradientePrado = ctx.createLinearGradient(0, canvas.height * 0.7, 0, canvas.height);
+            gradientePrado.addColorStop(0, "#32CD32"); // Verde lima
+            gradientePrado.addColorStop(1, "#228B22"); // Verde bosque
+            ctx.fillStyle = gradientePrado;
+            ctx.fillRect(0, canvas.height * 0.7, canvas.width, canvas.height * 0.3);
         }
 
-        for (let i = 0; i < 50; i++) particulas.push(new Particula());
+        function dibujarNube(x, y, escala) {
+            ctx.save();
+            ctx.translate(x + Math.sin(tiempo * 0.2 + x) * 20, y); // Movimiento lento
+            ctx.scale(escala, escala);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+            ctx.beginPath();
+            ctx.arc(0, 0, 30, 0, Math.PI * 2);
+            ctx.arc(35, -10, 40, 0, Math.PI * 2);
+            ctx.arc(70, 0, 30, 0, Math.PI * 2);
+            ctx.arc(35, 15, 30, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
 
-        function dibujarFlor(x, y, escala, oscilacion) {
-            const petalos = 12;
-            const radio = 60 * escala;
+        function dibujarFlor(x, y, escala) {
+            const petalos = 10;
+            const radio = 40 * escala;
             
             ctx.save();
-            ctx.translate(x + Math.sin(tiempo + oscilacion) * 10, y); // Movimiento suave
-            
-            // Tallo
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.quadraticCurveTo(20, 100, 0, 400);
-            ctx.strokeStyle = "green";
-            ctx.lineWidth = 4;
-            ctx.stroke();
+            ctx.translate(x, y);
+            ctx.rotate(Math.sin(tiempo + x) * 0.03); // Balanceo individual suave
 
-            // Pétalos
+            // Pétalos compactos
+            ctx.fillStyle = "#FFD700"; // Amarillo oro
+            ctx.strokeStyle = "#DAA520"; // Borde dorado
+            ctx.lineWidth = 1;
             for (let i = 0; i < petalos; i++) {
                 ctx.save();
-                ctx.rotate((i * Math.PI * 2) / petalos + Math.sin(tiempo * 0.5) * 0.05);
+                ctx.rotate((i * Math.PI * 2) / petalos);
                 ctx.beginPath();
                 ctx.moveTo(0, 0);
-                ctx.bezierCurveTo(-radio/2, -radio/2, -radio/2, -radio*1.5, 0, -radio*1.5);
-                ctx.bezierCurveTo(radio/2, -radio*1.5, radio/2, -radio/2, 0, 0);
-                ctx.fillStyle = "#FFD700";
+                // Curvas bezier para pétalos redondeados
+                ctx.bezierCurveTo(-radio/2, -radio/2, -radio/1.5, -radio*1.2, 0, -radio*1.2);
+                ctx.bezierCurveTo(radio/1.5, -radio*1.2, radio/2, -radio/2, 0, 0);
                 ctx.fill();
                 ctx.stroke();
                 ctx.restore();
             }
 
-            // Centro
+            // Centro de la flor
             ctx.beginPath();
-            ctx.arc(0, 0, 15 * escala, 0, Math.PI * 2);
-            ctx.fillStyle = "#5c3317";
+            ctx.arc(0, 0, 10 * escala, 0, Math.PI * 2);
+            ctx.fillStyle = "#8B4513"; // Marrón
             ctx.fill();
             ctx.restore();
         }
 
+        function dibujarRamo(x, y) {
+            // Sostén del ramo (tallos agrupados)
+            ctx.strokeStyle = "#228B22";
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, y + 250); // Tallo principal abajo
+            // Tallos que se abren hacia las flores
+            ctx.moveTo(x, y + 100); ctx.lineTo(x - 60, y - 50);
+            ctx.moveTo(x, y + 100); ctx.lineTo(x + 60, y - 50);
+            ctx.moveTo(x, y + 100); ctx.lineTo(x - 30, y - 70);
+            ctx.moveTo(x, y + 100); ctx.lineTo(x + 30, y - 70);
+            ctx.stroke();
+
+            // Lazo/Cinta del ramo
+            ctx.fillStyle = "#FF69B4"; // Rosa Hot Pink
+            ctx.beginPath();
+            ctx.arc(x, y + 100, 15, 0, Math.PI * 2); // Nudo
+            ctx.fill();
+            // Lados del lazo
+            ctx.beginPath();
+            ctx.ellipse(x - 20, y + 100, 20, 10, Math.PI/4, 0, Math.PI * 2);
+            ctx.ellipse(x + 20, y + 100, 20, 10, -Math.PI/4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Dibujar las flores AGRUPADAS (formando una semiesfera)
+            dibujarFlor(x, y, 1.0); // Central
+            dibujarFlor(x - 55, y - 30, 0.9); // Izquierda
+            dibujarFlor(x + 55, y - 30, 0.9); // Derecha
+            dibujarFlor(x - 30, y - 70, 0.85); // Arriba Izq
+            dibujarFlor(x + 30, y - 70, 0.85); // Arriba Der
+            dibujarFlor(x, y - 90, 0.8); // Cima
+        }
+
+        // --- BUCLE DE ANIMACIÓN PRINCIPAL ---
+
         function animar() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            tiempo += 0.02;
+            tiempo += 0.01;
 
-            particulas.forEach(p => { p.update(); p.draw(); });
+            dibujarCieloYPrado();
+            
+            // Nubes de fondo
+            dibujarNube(100, 100, 0.8);
+            dibujarNube(canvas.width - 200, 150, 1.2);
+            dibujarNube(canvas.width / 2 + 50, 80, 0.6);
 
-            // Dibujamos el ramo
-            dibujarFlor(canvas.width/2, canvas.height/2.5, 1.2, 0);
-            dibujarFlor(canvas.width/2 - 120, canvas.height/2.2, 0.9, 1);
-            dibujarFlor(canvas.width/2 + 120, canvas.height/2.2, 0.9, 2);
-            dibujarFlor(canvas.width/2 - 70, canvas.height/3, 0.7, 3);
-            dibujarFlor(canvas.width/2 + 70, canvas.height/3, 0.7, 4);
+            // Ramo animado en el centro del prado
+            const centroX = canvas.width / 2;
+            const centroY = canvas.height * 0.65; // Justo sobre la línea del horizonte
+            
+            ctx.save();
+            // Balanceo suave de TODO el ramo
+            ctx.translate(centroX, centroY);
+            ctx.rotate(Math.sin(tiempo * 0.5) * 0.02);
+            ctx.translate(-centroX, -centroY);
+            dibujarRamo(centroX, centroY);
+            ctx.restore();
 
-            if (tiempo > 2) mensaje.style.opacity = 1;
+            if (tiempo > 1.5) mensaje.style.opacity = 1;
 
             requestAnimationFrame(animar);
         }
 
         animar();
 
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
     </script>
 </body>
 </html>
