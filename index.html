@@ -2,26 +2,35 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>21 de Marzo 🌻</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para una Ingeniera Especial 🌻</title>
     <style>
         body { background-color: #050505; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; flex-direction: column; font-family: 'Courier New', Courier, monospace; }
-        canvas { filter: drop-shadow(0 0 20px rgba(255, 255, 0, 0.5)); }
-        #mensaje { color: #FFD700; margin-top: 20px; opacity: 0; transition: opacity 2s; text-align: center; padding: 0 20px; }
+        #lienzoContenedor { position: relative; width: 100%; height: 100%; max-width: 600px; max-height: 700px; }
+        canvas { width: 100%; height: 100%; filter: drop-shadow(0 0 15px rgba(255, 255, 0, 0.3)); }
+        #mensaje { position: absolute; bottom: 30px; left: 0; width: 100%; color: #FFD700; opacity: 0; transition: opacity 3s; text-align: center; padding: 0 10px; box-sizing: border-box; }
+        h1 { font-size: 1.5rem; margin-bottom: 5px; }
+        p { font-size: 1rem; margin-top: 0; }
     </style>
 </head>
 <body>
-    <canvas id="florCanvas"></canvas>
-    <div id="mensaje">
-        <h1>Unas flores amarillas que nunca se marchitan...</h1>
-        <p>Especialmente compiladas para una futura ingeniera<3.</p>
+    <div id="lienzoContenedor">
+        <canvas id="ramoCanvas"></canvas>
+        <div id="mensaje">
+            <h1>Ramo eterno compilado para ti</h1>
+            <p>21 de Marzo // 2026</p>
+        </div>
     </div>
 
     <script>
-        const canvas = document.getElementById('florCanvas');
+        const canvas = document.getElementById('ramoCanvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = 400;
-        canvas.height = 400;
+        
+        // Ajuste de resolución para que se vea bien en móviles
+        canvas.width = 600;
+        canvas.height = 700;
 
+        // --- FUNCIÓN BASE: Dibuja UN pétalo ---
         function dibujarPetalo(x, y, radio, angulo) {
             ctx.save();
             ctx.translate(x, y);
@@ -30,41 +39,75 @@
             ctx.moveTo(0, 0);
             ctx.bezierCurveTo(-radio/2, -radio/2, -radio/2, -radio*1.5, 0, -radio*1.5);
             ctx.bezierCurveTo(radio/2, -radio*1.5, radio/2, -radio/2, 0, 0);
-            ctx.fillStyle = "#FFD700";
+            ctx.fillStyle = "#FFD700"; // Amarillo intenso
             ctx.fill();
-            ctx.strokeStyle = "#DAA520";
+            ctx.strokeStyle = "#DAA520"; // Borde dorado
+            ctx.lineWidth = 1;
             ctx.stroke();
             ctx.restore();
         }
 
-        let petaloActual = 0;
-        const totalPetalos = 12;
+        // --- FUNCIÓN MAESTRA: Dibuja UNA flor completa ---
+        function dibujarFlorCompleta(centroX, centroY, escala, delayInicial) {
+            let petaloActual = 0;
+            const totalPetalos = 12;
+            const radioPetalo = 80 * escala;
 
-        function animarFlor() {
-            if (petaloActual < totalPetalos) {
-                dibujarPetalo(200, 200, 80, (petaloActual * Math.PI * 2) / totalPetalos);
-                petaloActual++;
-                setTimeout(animarFlor, 250);
-            } else {
-                // Dibujar el centro de la flor
-                ctx.beginPath();
-                ctx.arc(200, 200, 25, 0, Math.PI * 2);
-                ctx.fillStyle = "#8B4513";
-                ctx.fill();
-                // Mostrar mensaje
-                document.getElementById('mensaje').style.opacity = '1';
+            function animar() {
+                if (petaloActual < totalPetalos) {
+                    dibujarPetalo(centroX, centroY, radioPetalo, (petaloActual * Math.PI * 2) / totalPetalos);
+                    petaloActual++;
+                    setTimeout(animar, 150); // Velocidad de dibujo de cada pétalo
+                } else {
+                    // Centro de la flor
+                    ctx.beginPath();
+                    ctx.arc(centroX, centroY, 25 * escala, 0, Math.PI * 2);
+                    ctx.fillStyle = "#8B4513";
+                    ctx.fill();
+                }
             }
+            // Retraso para que las flores no aparezcan todas a la vez
+            setTimeout(animar, delayInicial);
         }
 
-        // Tallo
-        ctx.strokeStyle = "green";
-        ctx.lineWidth = 5;
-        ctx.beginPath();
-        ctx.moveTo(200, 200);
-        ctx.lineTo(200, 400);
-        ctx.stroke();
+        // --- DIBUJAR LOS TALLOS DEL RAMO ---
+        function dibujarTallos() {
+            ctx.strokeStyle = "green";
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            // Tallo central
+            ctx.moveTo(300, 300); ctx.lineTo(300, 700);
+            // Tallos laterales
+            ctx.moveTo(300, 500); ctx.lineTo(150, 300); // Izq
+            ctx.moveTo(300, 500); ctx.lineTo(450, 300); // Der
+            ctx.moveTo(300, 500); ctx.lineTo(200, 220); // Arriba Izq
+            ctx.moveTo(300, 500); ctx.lineTo(400, 220); // Arriba Der
+            ctx.stroke();
+        }
 
-        animarFlor();
+        // --- ALGORITMO PRINCIPAL DEL RAMO ---
+        dibujarTallos();
+
+        // Creamos una lista de posiciones y escalas para las flores
+        // [X, Y, Escala, Retraso de aparición]
+        const configuracionRamo = [
+            [300, 300, 1.0, 0],       // Flor central (primera)
+            [150, 300, 0.8, 1000],    // Flor izquierda
+            [450, 300, 0.8, 1000],    // Flor derecha
+            [200, 220, 0.7, 2000],    // Flor arriba izq
+            [400, 220, 0.7, 2000]     // Flor arriba der
+        ];
+
+        // Usamos un bucle para dibujar cada flor configurada
+        configuracionRamo.forEach(config => {
+            dibujarFlorCompleta(config[0], config[1], config[2], config[3]);
+        });
+
+        // Mostrar mensaje final después de que todo se dibuje
+        setTimeout(() => {
+            document.getElementById('mensaje').style.opacity = '1';
+        }, 3500);
+
     </script>
 </body>
 </html>
